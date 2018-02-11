@@ -5,73 +5,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <meta http-equiv="Content-Security-Policy" content="default-src * data: gap: https://ssl.gstatic.com; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval'">
   <script src="components/loader.js"></script>
-  <script src="lib/angular/angular.min.js"></script>
-  <script src="lib/onsenui/js/onsenui.min.js"></script>
-  <script src="lib/onsenui/js/angular-onsenui.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/onsenui/js/onsenui.min.js"></script>
+  <script src="lib/jquery.js"></script>
+  <script src="lib/aws-sdk-2.187.0.min.js"></script>
+  <script src="src/config.js"></script>
+  <script src="src/awsService.js"></script>
+  <script src="src/pedometerService.js"></script>
+  <script src="src/storageService.js"></script>
+  <script src="src/networkService.js"></script>
   <link rel="stylesheet" href="components/loader.css">
-  <link rel="stylesheet" href="lib/onsenui/css/onsenui.css">
-  <link rel="stylesheet" href="lib/onsenui/css/onsen-css-components.css">
   <link rel="stylesheet" href="css/style.css">
-
-  <script>
-  
-        //var hostUrl = 'https://templerun-authentication-prod.auth.ap-southeast-2.amazoncognito.com/login?redirect_uri=https%3A%2F%2Ftemplerun.co.nz%2Fcallback&response_type=code&client_id=576au5qaond486a2d9k97o65g3&state=hTdJYmwxvbEy74Bc084iqP3asfxk67ZQ&scope=phone%20email%20profile%20openid';
-        var hostUrl = 'https://suspicious-morse-ee0869.netlify.com/';
-        var authUrlKey = "Auth_Url";
-        
-        function setAuthUrlToLocalStorage(url){
-            localStorage.setItem(authUrlKey, url);
-        }
-        
-        function getAuthUrl(){
-            return localStorage.getItem(authUrlKey);
-        }
-        
-        function onDeviceReady() {
-                console.log('device ready');
-                //pedometer.startPedometerUpdates(successHandler, onError);
-            
-                var authUrlFromLocalStorage = getAuthUrl();
-                
-                if(false){
-                    $('<iframe>', {
-                       src: 'http://www.myloka.co.nz/',
-                       id:  'myFrame',
-                       frameBorder:"0"
-                       }).appendTo('body');
-                    
-                }else{
-                    var options = "location=no,toolbar=no";
-                    var ref = cordova.InAppBrowser.open(hostUrl, '_blank', options);
-                    ref.addEventListener('loadstop', function(event) { 
-                        if(event.url.indexOf('callback?') > 0){
-                            window.authUrl = event.url;
-                            setAuthUrlToLocalStorage(window.authUrl);
-                            ref.close();
-                            $('<iframe>', {
-                               src: window.authUrl,
-                               id:  'myFrame',
-                               frameBorder:"0"
-                               }).appendTo('body');
-                        }
-                    });                    
-                }
-                
-                var iframe = document.getElementById('myFrame').contentWindow;
-                var domain = "*";
-                
-    
-                setInterval(function(){
-                    var message = 'Hello!  The time is: ' + (new Date().getTime());
-                	console.log('blog.local:  sending message:  ' + message);
-                	iframe.postMessage(message,domain); //send the message and target URI
-                },5000);
-        }
-        
-        document.addEventListener("deviceready", onDeviceReady, false);
-  </script>
+  <link rel="stylesheet" href="https://unpkg.com/onsenui/css/onsenui.css">
+  <link rel="stylesheet" href="https://unpkg.com/onsenui/css/onsen-css-components.min.css">
 </head>
 <body>
+    <ons-navigator page="html/app.html"></ons-navigator>
 </body>
+<script src="src/app.js"></script>
+<script src="src/appOffline.js"></script>
 </html>
