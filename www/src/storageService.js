@@ -3,23 +3,13 @@ function addDistanceToLocal(distance){
     localStorage.setItem(window.localDistanceKey, distance);    
 }
 
-function addDistanceToLocalOffline(distance){
-    console.log('adding to storage offline:'+ distance);
-    localStorage.setItem(window.localDistanceKeyOffline, distance);    
-}
-
-function getDistanceFromLocalOffline(){
-    var distance = localStorage.getItem(window.localDistanceKeyOfflineBuffer);
-    return distance ? JSON.parse(distance): 0;
-}
-
 function addDistanceToLocalOfflineBuffer(distance){
     console.log('adding to storage offline buffer:'+ distance);
     localStorage.setItem(window.localDistanceKeyOfflineBuffer, distance);    
 }
 
 function getDistanceFromLocalOfflineBuffer(){
-    var distance = localStorage.getItem(window.localDistanceKeyOffline);
+    var distance = localStorage.getItem(window.localDistanceKeyOfflineBuffer);
     return distance ? JSON.parse(distance): 0;
 }
 
@@ -40,8 +30,6 @@ function setTrackingValue(isTracking){
 window.storageService = {
     addDistanceToLocal: addDistanceToLocal,
     getDistanceFromLocal: getDistanceFromLocal,
-    getDistanceFromLocalOffline: getDistanceFromLocalOffline,
-    addDistanceToLocalOffline: addDistanceToLocalOffline,
     addDistanceToLocalOfflineBuffer:addDistanceToLocalOfflineBuffer,
     getDistanceFromLocalOfflineBuffer:getDistanceFromLocalOfflineBuffer,
     setTrackingValue: setTrackingValue,

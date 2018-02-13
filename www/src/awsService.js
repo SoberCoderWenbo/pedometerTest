@@ -38,6 +38,7 @@ function invokeAddDistance(linkingData, distance, webRef){
 
 function invokeAddErrorDistance(linkingData, distance, webRef){
     window.setUserCredential(linkingData);
+    console.log(linkingData.token)
     console.log("sending previous error distance to:" + distance);
     var data = JSON.stringify({action: window.serverActions.addDistance, distanceInMeters: distance });        
 	new AWS.Lambda().invoke({ FunctionName: window.userFunctionName,

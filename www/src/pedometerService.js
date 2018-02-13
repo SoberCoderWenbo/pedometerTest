@@ -3,13 +3,8 @@ function initPedometer(){
     pedometer.startPedometerUpdates(successHandler, onError);
     console.log('started pedometer...');
     function successHandler(pedometerData){
-       console.log("steps:"+pedometerData.numberOfSteps);
-       var isOffline = window.checkNetworkConnection() === "none";
-       if(isOffline === true){
-           storageService.addDistanceToLocalOffline(pedometerData.numberOfSteps);               
-       }else{
-           storageService.addDistanceToLocal(pedometerData.numberOfSteps);    
-       }
+        console.log("steps:"+pedometerData.numberOfSteps);
+        storageService.addDistanceToLocal(pedometerData.numberOfSteps);    
     }
     
     function onError(e){
@@ -20,6 +15,12 @@ function initPedometer(){
 function stopPedometer(){
     pedometer.stopPedometerUpdates(function(){
         console.log("successfully to stopped pedometer");
+        var currentLocalSteps = storageService.getDistanceFromLocal();
+        var currentLocalBuffer = storageService.getDistanceFromLocalOfflineBuffer();
+        var newCurrentBuffer = parseInt(currentLocalSteps) + parseInt(currentLocalBuffer);
+        storageService.addDistanceToLocalOfflineBuffer(newCurrentBuffer);
+        console.log('new local buffer:' + newCurrentBuffer);
+        storageService.addDistanceToLocal(0);
     }, function(error){
         console.log("failed to stop pedometer");
     });    

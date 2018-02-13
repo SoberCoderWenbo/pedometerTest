@@ -4,13 +4,8 @@ document.addEventListener('init', function(event) {
     var storageService = window.storageService;
     
     if (page.matches('#offline-app')) {
-        var currentSteps = storageService.getDistanceFromLocal();
-        console.log('current steps from offline app:' + currentSteps)
         var isTracking = storageService.isTracking();
-        console.log('is tracking from offline app:' + isTracking);
-        var stepDisplay = $(page).find('#offline-steps');
-        stepDisplay.html(currentSteps);
-        
+        var stepDisplay = $(page).find('#offline-steps');        
         var startBtn = $(page).find('#start-btn');
         var stopBtn = $(page).find('#stop-btn');    
         
@@ -26,14 +21,6 @@ document.addEventListener('init', function(event) {
         
         stopBtn.click(function(){
            pedometerService.stopPedometer(); 
-           var unsavedOnlineSteps = storageService.getDistanceFromLocal();
-           var unsavedOfflineSteps = storageService.getDistanceFromLocalOffline();
-           var offlineBuffer = storageService.getDistanceFromLocalOfflineBuffer();
-           
-           var currentTotal = parseInt(unsavedOnlineSteps) + parseInt(unsavedOfflineSteps) + parseInt(offlineBuffer);
-           storageService.addDistanceToLocalOfflineBuffer(currentTotal);
-           storageService.addDistanceToLocal(0);
-           storageService.addDistanceToLocalOffline(0);
            storageService.setTrackingValue(false);
            
            startBtn.show();
@@ -50,10 +37,9 @@ document.addEventListener('init', function(event) {
     
         window.offlineAppInterval = setInterval(function(){
             var latestStepsonline = storageService.getDistanceFromLocal();
-            var latestStepsOffline = storageService.getDistanceFromLocalOffline();
             var latestOfflineBuffer = storageService.getDistanceFromLocalOfflineBuffer();
-            var total = parseInt(latestStepsonline) + parseInt(latestStepsOffline) + parseInt(latestOfflineBuffer);
-            console.log('offline app interval: (online:' + latestStepsonline + ') (offline:' + latestStepsOffline + ') (buffer:' + latestOfflineBuffer + ')' );
+            var total = parseInt(latestStepsonline) + parseInt(latestOfflineBuffer);
+            console.log('offline app interval: (online:' + latestStepsonline + ')(buffer:' + latestOfflineBuffer + ')' );
             stepDisplay.html(total);
         }, 1000);        
     }

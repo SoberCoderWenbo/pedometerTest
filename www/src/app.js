@@ -20,6 +20,9 @@ document.addEventListener("deviceready", onDeviceReady, false);
         var intervalValue = 1000;        
         var getTokenInterval;
         var setDistanceInterval;
+        var checkSyncInterval;
+        
+        var linkingData;
                         
         var ref = cordova.InAppBrowser.open(hostUrl, '_blank', inAppWindowConfigs);
         initNetworkService(ref);
@@ -29,19 +32,33 @@ document.addEventListener("deviceready", onDeviceReady, false);
             
             setDistanceInterval = setInterval(function() {
                 var distance = storageService.getDistanceFromLocal();
-                var distanceValue = distance || 0;
-                var latestStepsOffline = storageService.getDistanceFromLocalOffline();
-                var latestOfflineBuffer = storageService.getDistanceFromLocalOfflineBuffer();
-                var stepsCode = "localStorage.setItem('steps'," + distanceValue + ");";
-                var offlineStepsCode = "localStorage.setItem('offlineSteps'," + distanceValue + ");";
-                var offlineBufferStepsCode = "localStorage.setItem('offlineBufferSteps'," + distanceValue + ");";
-                var code = stepsCode + offlineStepsCode + offlineBufferStepsCode;
-                ref.executeScript({ code: code }, function(values){});
+                var distanceBuffer = storageService.getDistanceFromLocalOfflineBuffer();
+                var total = parseInt(distance) + parseInt(distanceBuffer);
+                var stepsCode = "localStorage.setItem('steps'," + total + ");";
+                ref.executeScript({ code: stepsCode }, function(values){});
+            }, intervalValue)
+            
+            checkSyncInterval = setInterval(function() {
+                ref.executeScript({ code: "localStorage.getItem('sync');" }, function(values) {                
+                    if(values && values[0] && values[0] == "true"){
+                        var distance = storageService.getDistanceFromLocal();
+                        var distanceBuffer = storageService.getDistanceFromLocalOfflineBuffer();
+                        var total = parseInt(distance) + parseInt(distanceBuffer);
+                        
+                        if(total > 0){
+                            invokeAddDistance(linkingData, total, ref);
+                            var syncCode = "localStorage.setItem('sync','false');";
+                            ref.executeScript({ code: syncCode }, function(values){});
+                            storageService.addDistanceToLocal(0);
+                            storageService.addDistanceToLocalOfflineBuffer(0);
+                        }
+                    }
+                });
             }, intervalValue)
             
             getTokenInterval = setInterval(function() {
-                ref.executeScript({ code: "localStorage.getItem('linkingData')" }, function(values) {
-                    
+                ref.executeScript({ code: "localStorage.getItem('linkingData');" }, function(values) {
+                    linkingData = JSON.parse(values[0]);
                     if(values && values[0]){
                         var errorSteps = getStepsFromErrorStorage();
                         if(parseInt(errorSteps) > 0){
@@ -52,17 +69,7 @@ document.addEventListener("deviceready", onDeviceReady, false);
                         
                     if(values && values[0] && JSON.parse(values[0]).tracking === false){
                         var currentDistance = storageService.getDistanceFromLocal();                    
-                        if(currentDistance > 0){
-                                        
-                            var latestStepsOffline = storageService.getDistanceFromLocalOffline();
-                            var latestOfflineBuffer = storageService.getDistanceFromLocalOfflineBuffer();
-                            var total = parseInt(currentDistance) + parseInt(latestStepsOffline) + parseInt(latestOfflineBuffer);
-                            
-                            invokeAddDistance(JSON.parse(values[0]), total, ref);
-                            storageService.addDistanceToLocal(0);
-                            storageService.addDistanceToLocalOfflineBuffer(0);
-                            storageService.addDistanceToLocalOffline(0);
-                            
+                        if(currentDistance > 0){                            
                             pedometerService.stopPedometer();
                             storageService.setTrackingValue(false);   
                         }
@@ -79,7 +86,9 @@ document.addEventListener("deviceready", onDeviceReady, false);
 
         ref.addEventListener('exit', function() {
             clearInterval(setDistanceInterval);
-            clearInterval(getTokenInterval);      
+            clearInterval(getTokenInterval);   
+            clearInterval(checkSyncInterval); 
+            //clearInterval(window.offlineAppInterval);
         });
     }
 
